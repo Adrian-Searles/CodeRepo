@@ -1,0 +1,618 @@
+%%[
+
+/* get job and subscriber info from click */
+
+
+set @subscriberkey = _subscriberkey
+set @email = emailaddr
+set @jobid = jobid
+set @batchid = _JobSubscriberBatchID
+set @listid = listid
+set @emailName = emailname_
+set @max = 94
+]%%
+
+<script runat="server">
+  Platform.Load("Core","1.1.1");
+  try{
+    var sub = Attribute.GetValue("_subscriberkey");
+    var email = Attribute.GetValue("emailaddr");    
+</script>
+
+%%[
+if not empty(@subscriberkey) == true AND not empty(@email) == true then 
+
+var @Description, @ListName, @status
+SET @rr = CreateObject("RetrieveRequest")
+SetObjectProperty(@rr, "ObjectType", "List")  
+AddObjectArrayItem(@rr,"Properties","ID")  
+AddObjectArrayItem(@rr,"Properties","ListName")
+AddObjectArrayItem(@rr,"Properties","Description")
+
+SET @sfp = CreateObject("SimpleFilterPart")  
+SetObjectProperty(@sfp, "Property", "ListClassification")  
+SetObjectProperty(@sfp, "SimpleOperator", "equals")  
+AddObjectArrayItem(@sfp, "Value",  "PublicationList")    
+SetObjectProperty(@rr, "Filter", @sfp) 
+
+
+
+SET @sub = InvokeRetrieve(@rr)  
+
+
+]%%
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title> Example Preference Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style class="main_style">
+
+      h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700; /* bold */
+      }
+
+      .responsive-name {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700; /* bold */
+      }
+      th {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 400; /* bold */
+      }
+      body {
+
+        display: contents;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 400; /* black */
+        color: #000;  
+        font-size: 12px;
+        margin: 0 auto;
+        max-width: 1280px;
+      }
+
+
+      input[type=checkbox] {
+        height: 0;
+        width: 0;
+        visibility: hidden;
+        vertical-align: middle;
+
+      }
+
+
+      input:checked + label {
+        background: #4c99c0;
+      }
+
+      input:checked + label:after {
+        left: calc(100% - 2px);
+        transform: translateX(-100%);
+      }
+
+      label {
+        cursor: pointer;
+        text-indent: -9999px;
+        width: 40px;
+        height: 21px;
+        background: #7f7f7f;
+        display: block;
+        border-radius: 10px;
+        position: relative;
+        vertical-align: middle;
+        margin-bottom: 20px;
+      }
+
+      label.toggle::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 17px;
+        height: 17px;
+        background: #fff;
+        border-radius: 10px;
+        transition: 0s;
+      }
+      label.selectAll{
+        margin-top: 0px;
+        margin-bottom: 5px;
+        display: inline-block;
+        margin-left: -3px;
+      }
+
+      span{
+        margin-left: 20px;
+      }
+
+      label::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 17px;
+        height: 17px;
+        background: #fff;
+        border-radius: 10px;
+        transition: 0s;
+      }
+
+
+      .submit_{
+        color: #f1f2f2;
+        background-color: #4c99c0;
+        font-size: 14px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700; /* bold */
+        text-decoration: none;
+        border: 1px solid #4184a6;
+        cursor: pointer;
+        margin-top: 10px;
+        display: inline-block;
+        margin-right: auto;
+        text-align: center;
+        padding-left: 40px;
+        padding-right: 40px;
+        height: 40px;
+        border-radius: 20px;
+      }
+
+      .Opt_out{
+        color: #4c99c0;
+        background-color: #FFFFFF;
+        font-size: 14px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700; /* bold */
+        text-decoration: none;
+        border: 1px solid #4184a6;
+        cursor: pointer;
+        margin-top: 10px;
+        display: inline-block;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+        height: 40px;
+        border-radius: 20px;
+
+      }
+
+      .layout-canvas-g {
+        background-color: #fff;
+        border: none;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        padding: 0;
+        width: 100%;
+      }
+      .layout-canvas-g > .header
+      {
+        position: relative;
+        overflow: auto;
+        width: 100%;
+        word-wrap: break-word;
+      }
+      .layout-canvas-g > .section {
+        margin-bottom: 10px;
+      }
+
+      .layout-canvas-g > .section > .columns {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        word-wrap: break-word;
+      }
+      @media only screen and (max-width: 480px) {
+        th {
+          visibility: hidden; 
+        }
+        .responsive {
+          text-align: center;
+          border-bottom: none !important;
+          border-top: none !important;
+          display: block;
+          width: 100%
+        }
+        .responsive-checkbox{
+          text-align: -webkit-left;
+          width:10%
+        }
+        .responsive-desc {
+          text-align: center;
+
+          border-top: none !important;
+          display: block;
+          float: right;
+          width: 100%;
+          padding-top: 0 !important;
+
+        }
+        .responsive-name{
+          display: block;
+          width: 100%;
+          text-align: center;
+        }
+
+
+        .mobile-hidden {
+          display: none !important;
+        }
+      }
+      .layout-canvas-g > .section > .columns {
+        width: 100%;
+      }
+
+
+    </style>
+
+    %%=Concat('<','scr', 'ipt>')=%%
+window.addEventListener("load", (event) => {    
+    const selectAllCheckbox = document.getElementById("selectAll");
+
+
+    const checkboxes = document.querySelectorAll(".select");
+    const descriptions = document.querySelectorAll("td.responsive-desc");
+
+    descriptions.forEach(function(td) {
+      var innerHTMLText = td.innerHTML;
+      //console.log(td.innerHTML);
+
+      if(innerHTMLText.length > 94) {
+     //   console.log(td.innerHTML + ' ' + td.clientHeight);
+        td.style.height = (td.clientHeight + 19) + 'px';
+
+
+      }
+
+    });
+
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", function() {
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = selectAllCheckbox.checked;
+        });
+      });
+    }
+  });
+
+
+
+%%=Concat('</','scr', 'ipt>')=%%
+
+
+  </head>
+  <body>
+    <div class="layout layout-canvas-g">
+      <div class="section">
+        <div class="columns col1">
+          <!-- Blue banner -->
+          <table class="banner" width="100%" bgcolor="#4c99c0" border="0" cellspacing="0" cellpadding="15" >
+            <tbody>
+              <tr>
+                <td> 
+                  <table align="center" width="720" border="0" cellspacing="0" cellpadding="0">
+                    <tbody>
+                      <tr> 
+                        <td class="banner" style=" vertical-align:top; font-size:12px; color: #0471AF;  mso-line-height-rule:exactly; line-height: 14px; padding-top:15px; text-align:left">
+                        </td> 
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+              <tr>
+                <td>
+
+                  <table width="720" border="0" cellspacing="0" cellpadding="0" align="center">
+                    <tbody>
+                      <tr>
+                        <td style="padding-left: 10px;">
+                          <span style="font-size:10px;"></span>
+
+                          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <table border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                      <tr>
+                                        <td align="left" style="padding-top: 20px;"><a href=" " target="_blank"><img src=" " alt=" " border="0" style="display:block" width="255" height= "auto"></a>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td><br></td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <form action="%%=cloudpagesURL(' ')=%%" method="post">
+
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+
+                                <tr>
+                                  <td style="vertical-align:top; font-size:16px; color: #000000; text-decoration: none; text-align: left; line-height: 20px; font-weight:normal; padding:0px;">
+                                    <h1 style=" font-size:3em;">Email Preferences</h1>
+                                    <p style="font-size:15px; padding-bottom: 10px;">Below are your current subscriptions and preferences for the email address:<br>%%=v(@email)=%%. You may use this page to update your selections or choose to unsubscribe from all our email communications.</p>  
+                                    <table cellpadding="0" cellspacing="0" width="100%" >
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <input style="margin-bottom: 20px;" type="submit" name="submit" value="Save" class="submit_">
+                                          </td>
+                                          <td style="padding-top: 23px; padding-bottom: 10px;" align="center">
+
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td style=" border: 1px solid #efefef;" align="center">
+                                            <table width="98%" cellpadding="0" cellspacing="0" border="0" align="center" >
+                                              <tbody>
+                                                <tr>
+
+                                                  <th style="display: inline-block; font-size:12px; padding-top: 10px;" width="20%" class="less-top-padding" align="left">Off/On</th>
+                                                  <th style=" padding-top: 10px; display: inline-block; font-size:12px; text-align: left" width="30%">Newsletters</th>
+                                                  <th style=" padding-top: 10px; font-size:12px; text-align: left" width="50%">Description</th>
+                                                </tr>
+
+
+
+
+                                                %%[
+
+
+                                           For @i = 1 to RowCount(@Sub) do
+                                           Set @ListName = Field(Row(@Sub,@i),"ListName")
+                                           Set @Description = Field(Row(@Sub,@i),"Description")
+                                           Set @currid = Field(Row(@Sub,@i),"ID")
+                                           if empty(@Description) then 
+                                           set @Description = "Check Back later"
+                                           endif
+
+
+                                           SET @rr2 = CreateObject("RetrieveRequest")
+                                           SetObjectProperty(@rr2, "ObjectType", "ListSubscriber")  
+                                           AddObjectArrayItem(@rr2,"Properties","ListID")
+                                           AddObjectArrayItem(@rr2,"Properties","ID")
+                                           AddObjectArrayItem(@rr2,"Properties","SubscriberKey")
+                                           AddObjectArrayItem(@rr2,"Properties","Status")
+
+
+
+                                           SET @sfp3 = CreateObject("SimpleFilterPart")  
+                                           SetObjectProperty(@sfp3, "Property", "SubscriberKey")  
+                                           SetObjectProperty(@sfp3, "SimpleOperator", "equals")  
+                                           AddObjectArrayItem(@sfp3, "Value",  @subscriberkey)
+
+                                           SET @sfp2 = CreateObject("SimpleFilterPart")
+                                           SetObjectProperty(@sfp2, "Property", "ListID")
+                                           SetObjectProperty(@sfp2, "SimpleOperator", "equals")
+                                           AddObjectArrayItem(@sfp2, "Value", FormatNumber(@currid,"G"))
+
+                                           Set @cf1 = CreateObject("ComplexFilterPart")
+                                           SetObjectProperty(@cf1,"LeftOperand",@sfp2)
+                                           SetObjectProperty(@cf1,"RightOperand",@sfp3)
+                                           SetObjectProperty(@cf1,"LogicalOperator","AND")
+
+
+                                           SetObjectProperty(@rr2, "Filter", @cf1)
+
+                                           SET @LookupSub = InvokeRetrieve(@rr2)
+
+                                           if rowcount(@LookupSub) >= 1 then
+
+                                           for @j = 1 to rowcount(@LookupSub) do
+                                           Set @status = Field(Row(@LookupSub,@j),"Status")
+
+
+                                           next @j
+
+                                           endif
+
+                                           if empty(@status) then
+                                           set @status = "Unsubscribed"
+
+                                           endif
+
+                                           if @i < 5 then
+
+                                           ]%%
+
+
+
+                                                <tr class="responsive">
+                                                  <td width="44%" class="responsive" style="border-bottom: 1px solid #efefef;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+                                                      <tbody>
+                                                        <tr class="responsive-checkbox-name">
+                                                          <td width="20%" align="left" class="responsive-checkbox">
+                                                            <input type= "checkbox" class="select" name= "%%=v(@currid)=%%" id="%%=v(@currid)=%%" %%[if
+                                                      @status != "Unsubscribed" then]%%checked%%[endif]%%>
+                                                            <label for="%%=v(@currid)=%%" class="toggle" style="vertical-align: middle;">
+                                                              "Toggle"
+                                                            </label>
+                                                            <input type="hidden" name="%%=v(@currid)=%%" value="off">
+
+                                                          </td>
+                                                          <td class="responsive-name" width="100%" style="font-size:16px; padding-right:5px; ">%%=v(@ListName)=%%</td>
+                                                        </tr>
+                                                      </tbody>
+                                                    </table>
+                                                  </td>
+                                                  <td width="56%" style="font-size:12px; color: #7f7f7f; border-bottom: 1px solid #efefef;" class="responsive-desc">%%=v(@description)=%%</td>
+
+
+                                                </tr>
+                                                %%[   
+                                           endif
+                                           if @i == 5 then
+                                           ]%%
+                                                <tr>
+                                                  <td>
+                                                    &nbsp;
+                                                    <br><br>
+                                                    <!--you just need a space in a row-->
+                                                  </td>
+                                                </tr>
+
+                                                <tr>
+                                                  <th style=" display: inline-block; font-size:12px; padding-top: 10px;" width="20%" class="less-top-padding" align="left">Off/On</th>
+                                                  <th style=" display: inline-block; padding-top: 10px; font-size:12px; text-align: left" width="50%">Product Interests</th>
+                                                  <th style=" padding-top: 10px; font-size:12px; text-align: left" width="50%">Description</th>
+
+                                                </tr>
+                                                <tr class="responsive">
+                                                  <td width="44%" class="responsive" style="border-bottom: 1px solid #efefef;"  >
+                                                    <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" >
+                                                      <tbody>
+
+                                                        <tr class="responsive-checkbox-name">
+                                                          <td width="20%" align="left" class="responsive-checkbox">
+                                                            <input type= "checkbox" class="select" name= "%%=v(@currid)=%%" id="%%=v(@currid)=%%" %%[if
+                                                       @status != "Unsubscribed" then]%%checked%%[endif]%%>
+                                                            <label for="%%=v(@currid)=%%" class="toggle" style="vertical-align: middle;">
+                                                              "Toggle"
+                                                            </label>
+                                                            <input type="hidden" name="%%=v(@currid)=%%" value="off" >
+
+                                                          </td>
+                                                          <td class="responsive-name" width="100%" style="font-size:16px; ">%%=v(@ListName)=%%</td>
+                                                        </tr>
+                                                      </tbody>
+                                                    </table>
+                                                  </td>
+                                                  <td width="56%" style="font-size:12px; color: #7f7f7f; border-bottom: 1px solid #efefef;" class="responsive-desc">%%=v(@description)=%%</td>
+
+
+                                                </tr>
+
+
+                                                %%[
+                                           endif
+                                           if @i > 5 then
+                                           ]%%
+                                                <tr class="responsive">
+                                                  <td width="44%" class="responsive" style="%%[if @i != RowCount(@Sub) then ]%% border-bottom: 1px solid #efefef;%%[endif]%%" >
+                                                    <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+                                                      <tbody>
+                                                        <tr class="responsive-checkbox-name">
+                                                          <td width="20%" align="left" class="responsive-checkbox">
+                                                            <input type= "checkbox" class="select" name= "%%=v(@currid)=%%" id="%%=v(@currid)=%%" %%[if
+                                                       @status != "Unsubscribed" then]%%checked%%[endif]%%>
+                                                            <label for="%%=v(@currid)=%%" class="toggle" style="vertical-align: middle;">
+                                                              "Toggle"
+                                                            </label>
+                                                            <input type="hidden" name="%%=v(@currid)=%%" value="off" >
+
+                                                          </td>
+                                                          <td class="responsive-name" width="100%" style="font-size:16px;">%%=v(@ListName)=%%</td>
+                                                        </tr>
+                                                      </tbody>
+                                                    </table>
+                                                  </td>
+                                                  <td width="56%" style="font-size:12px; color: #7f7f7f; %%[if @i != RowCount(@Sub) then ]%% border-bottom: 1px solid #efefef;%%[endif]%%" class="responsive-desc">%%=v(@description)=%%</td>
+
+
+                                                </tr>
+
+
+
+                                                %%[
+                                           endif
+                                           next @i
+
+                                           ]%%
+
+                                              </tbody>
+                                            </table>
+                                          </td>
+                                        </tr>
+
+
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <br><br>
+
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" >
+                              <tbody>
+                                <tr>
+                                  <td>
+                                    <input type="checkbox" name="selectAll" id="selectAll" >
+                                    <label for="selectAll" class="selectAll">
+                                      Select All
+                                    </label>
+                                    <span style="font-size:18px; font-weight: 700;">Select All</span> 
+
+                                    <br>
+                                  </td>
+
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    <input type="submit" name="submit" value="Save" class="submit_">
+                                    <input type="submit" name="Opt_out" value="Unsubscribe from All" class="Opt_out" style=" padding-left: 10px; padding-right: 10px; margin-left: 20px">
+                                  </td>
+                                  <td>
+                                    <input type="hidden" name="subscriberkey" value="%%=v(@subscriberkey)=%%" >
+                                    <input type="hidden" name="email" value="%%=v(@email)=%%" >
+                                    <input type="hidden" name="jobid" value="%%=v(@jobid)=%%" >
+                                    <input type="hidden" name="batchid" value="%%=v(@batchid)=%%" >
+                                    <input type="hidden" name="listid" value="%%=v(@listid)=%%" >
+                                    <input type="hidden" name="emailName" value="%%=v(@emailName)=%%" >
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </form>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+
+
+          %%[else]%%
+          You've reached this page in error
+
+          %%[ 
+endif 
+]%%
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<script runat="server">
+  }catch(e){
+    Write(Stringify(e));
+  }
+</script>
